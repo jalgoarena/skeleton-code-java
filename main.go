@@ -18,9 +18,10 @@ func SetupRouter() *gin.Engine {
 }
 
 func main() {
-	const defaultPort = "8080"
-
+	SetupProblemsHost()
 	router := SetupRouter()
+
+	const defaultPort = "8081"
 	port := os.Getenv("PORT")
 
 	if len(port) == 0 {
@@ -28,4 +29,16 @@ func main() {
 	}
 
 	router.Run(":" + port)
+}
+
+func SetupProblemsHost() {
+	const defaultProblemsHost = "http://localhost:8080"
+
+	problemsHost := os.Getenv("PROBLEMS_HOST")
+
+	if len(problemsHost) == 0 {
+		problemsHost = defaultProblemsHost
+	}
+
+	app.SetProblemsHost(problemsHost)
 }
