@@ -1,13 +1,24 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jalgoarena/problems-store/domain"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 )
+
+var tmpl = `import java.util.*;
+import com.jalgoarena.type.*;
+public class Solution {
+	{{ .Title }} {
+        // Write your code here
+    }
+}
+`
 
 var problemsHost string
 
@@ -41,11 +52,19 @@ func GetSkeletonCode(c *gin.Context) {
 		return
 	}
 
-	// TODO: Step 2 - fill java source code template with data
+	sourceCode := buildSourceCode(problem)
 
-	sourceCode := fmt.Sprintf("source code for %s", problem.Title)
+	c.String(200, "%v", sourceCode)
+}
 
-	c.String(200, "%v for %v", sourceCode, problemId)
+func buildSourceCode(problem *domain.Problem) string {
+	t := template.New("sourceCode")
+	t, _ = t.Parse(tmpl)
+
+	buf := new(bytes.Buffer)
+	t.Execute(buf, *problem)
+
+	return buf.String()
 }
 
 func loadProblem(problemsJson []byte) (*domain.Problem, error) {
