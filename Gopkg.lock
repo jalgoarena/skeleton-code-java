@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/jalgoarena/problems-store"
   packages = ["domain"]
-  revision = "cdf4812eac2e3496690a49a66fbecd3e03101c37"
+  revision = "8c41709c743e9276c66ef5d68c4134f034806ec2"
 
 [[projects]]
   name = "github.com/json-iterator/go"
