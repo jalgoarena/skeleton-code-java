@@ -77,7 +77,7 @@ public class Solution {
 	assert.Equal(t, javaSourceCode, w.Body.String())
 }
 
-func TestGetSkeletonCodeTwoSum(t *testing.T) {
+func TestGetSkeletonCodeForTwoSum(t *testing.T) {
 	var (
 		problemJson = `{
   "id": "2-sum",
@@ -132,7 +132,7 @@ public class Solution {
 	assert.Equal(t, javaSourceCode, w.Body.String())
 }
 
-func TestGetSkeletonCodeWordLadder(t *testing.T) {
+func TestGetSkeletonCodeForWordLadder(t *testing.T) {
 	var (
 		problemJson = `{
   "id": "word-ladder",
@@ -188,6 +188,61 @@ public class Solution {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/word-ladder", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeForInsertRange(t *testing.T) {
+	var (
+		problemJson = `{
+  "id": "insert-range",
+  "func": {
+    "name": "insertRange",
+    "returnStatement": {
+      "type": "java.util.ArrayList",
+      "comment": "Array with inserted ranges",
+      "generic": "Interval"
+    },
+    "parameters": [
+      {
+        "name": "intervalsList",
+        "type": "java.util.ArrayList",
+        "comment": "sorted, non-overlapping list of Intervals",
+        "generic": "Interval"
+      },
+      {
+        "name": "insert",
+        "type": "com.jalgoarena.type.Interval",
+        "comment": "interval to insert",
+        "generic": ""
+      }
+    ]
+  }
+}`
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param intervalsList sorted, non-overlapping list of Intervals
+     * @param insert interval to insert
+     * @return Array with inserted ranges
+     */
+    public ArrayList<Interval> insertRange(ArrayList<Interval> intervalsList, Interval insert) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemJson}
+	app.SetHttpClient(httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/insert-range", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
