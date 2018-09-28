@@ -19,7 +19,7 @@ import com.jalgoarena.type.*;
 public class Solution {
     /**
 {{ $last := (indexOfLastElement .Function.Parameters )}}{{ range $index, $param := .Function.Parameters }}     * @param {{ $param.Name }} {{ $param.Comment }}{{if ne $index $last}}{{print "\n"}}{{ end }}{{ end }}
-     * @return{{ .Function.Return.Comment }}
+     * @return {{ .Function.Return.Comment }}
      */
     public {{ javaTypeDeclaration .Function.Return.Type .Function.Return.Generic }} {{ .Function.Name }}({{ methodParameters .Function.Parameters }}) {
         // Write your code here

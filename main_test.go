@@ -37,7 +37,7 @@ func TestGetSkeletonCodeForFib(t *testing.T) {
     "name": "fib",
     "returnStatement": {
       "type": "java.lang.Long",
-      "comment": " N'th term of Fibonacci sequence",
+      "comment": "N'th term of Fibonacci sequence",
       "generic": ""
     },
     "parameters": [
@@ -85,7 +85,7 @@ func TestGetSkeletonCodeTwoSum(t *testing.T) {
     "name": "twoSum",
     "returnStatement": {
       "type": "[I",
-      "comment": " Indices of the two numbers",
+      "comment": "Indices of the two numbers",
       "generic": ""
     },
     "parameters": [
@@ -126,6 +126,68 @@ public class Solution {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/2-sum", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeWordLadder(t *testing.T) {
+	var (
+		problemJson = `{
+  "id": "word-ladder",
+  "func": {
+    "name": "ladderLength",
+    "returnStatement": {
+      "type": "java.lang.Integer",
+      "comment": "The shortest length",
+      "generic": ""
+    },
+    "parameters": [
+      {
+        "name": "begin",
+        "type": "java.lang.String",
+        "comment": "the begin word",
+        "generic": ""
+      },
+      {
+        "name": "end",
+        "type": "java.lang.String",
+        "comment": "the end word",
+        "generic": ""
+      },
+      {
+        "name": "dict",
+        "type": "java.util.HashSet",
+        "comment": "the dictionary",
+        "generic": "String"
+      }
+    ]
+  }
+}`
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param begin the begin word
+     * @param end the end word
+     * @param dict the dictionary
+     * @return The shortest length
+     */
+    public int ladderLength(String begin, String end, HashSet<String> dict) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemJson}
+	app.SetHttpClient(httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/word-ladder", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
