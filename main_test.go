@@ -7,10 +7,31 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-var fibProblemJson = `{
+type MockHttpClient struct {
+	problemJson string
+}
+
+func (m *MockHttpClient) Get(url string) (*http.Response, error) {
+	response := &http.Response{
+		Body:       ioutil.NopCloser(bytes.NewBuffer([]byte(m.problemJson))),
+		StatusCode: http.StatusOK,
+	}
+
+	return response, nil
+}
+
+func TestMain(m *testing.M) {
+	app.SetProblemsHost(problemsUrl)
+	os.Exit(m.Run())
+}
+
+func TestGetSkeletonCodeForFib(t *testing.T) {
+	var (
+		problemJson = `{
   "id": "fib",
   "func": {
     "name": "fib",
@@ -29,8 +50,7 @@ var fibProblemJson = `{
     ]
   }
 }`
-
-var fibSkeletonJavaSourceCode = `import java.util.*;
+		javaSourceCode = `import java.util.*;
 import com.jalgoarena.type.*;
 
 public class Solution {
@@ -42,21 +62,9 @@ public class Solution {
         // Write your code here
     }
 }`
+	)
 
-type MockHttpClient struct{}
-
-func (m *MockHttpClient) Get(url string) (*http.Response, error) {
-	response := &http.Response{
-		Body:       ioutil.NopCloser(bytes.NewBuffer([]byte(fibProblemJson))),
-		StatusCode: http.StatusOK,
-	}
-
-	return response, nil
-}
-
-func TestGetSkeletonCode(t *testing.T) {
-	httpClient := &MockHttpClient{}
-	app.SetProblemsHost(problemsUrl)
+	httpClient := &MockHttpClient{problemJson: problemJson}
 	app.SetHttpClient(httpClient)
 
 	router := SetupRouter()
@@ -66,5 +74,60 @@ func TestGetSkeletonCode(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, fibSkeletonJavaSourceCode, w.Body.String())
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeTwoSum(t *testing.T) {
+	var (
+		problemJson = `{
+  "id": "2-sum",
+  "func": {
+    "name": "twoSum",
+    "returnStatement": {
+      "type": "[I",
+      "comment": " Indices of the two numbers",
+      "generic": ""
+    },
+    "parameters": [
+      {
+        "name": "numbers",
+        "type": "[I",
+        "comment": "An array of Integer",
+        "generic": ""
+      },
+      {
+        "name": "target",
+        "type": "java.lang.Integer",
+        "comment": "target = numbers[index1] + numbers[index2]",
+        "generic": ""
+      }
+    ]
+  }
+}`
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param numbers An array of Integer
+     * @param target target = numbers[index1] + numbers[index2]
+     * @return Indices of the two numbers
+     */
+    public int[] twoSum(int[] numbers, int target) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemJson}
+	app.SetHttpClient(httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/2-sum", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
 }

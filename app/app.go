@@ -18,7 +18,7 @@ import com.jalgoarena.type.*;
 
 public class Solution {
     /**
-{{ range .Function.Parameters }}     * @param {{ .Name }} {{ .Comment }}{{ end }}
+{{ $last := (indexOfLastElement .Function.Parameters )}}{{ range $index, $param := .Function.Parameters }}     * @param {{ $param.Name }} {{ $param.Comment }}{{if ne $index $last}}{{print "\n"}}{{ end }}{{ end }}
      * @return{{ .Function.Return.Comment }}
      */
     public {{ javaTypeDeclaration .Function.Return.Type .Function.Return.Generic }} {{ .Function.Name }}({{ methodParameters .Function.Parameters }}) {
@@ -80,6 +80,7 @@ func buildSourceCode(problem *domain.Problem) (string, error) {
 	t.Funcs(template.FuncMap{
 		"javaTypeDeclaration": javaTypeDeclaration,
 		"methodParameters":    methodParameters,
+		"indexOfLastElement":  indexOfLastElement,
 	})
 	t, _ = t.Parse(tmpl)
 
@@ -91,6 +92,10 @@ func buildSourceCode(problem *domain.Problem) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+func indexOfLastElement(params []domain.Parameter) int {
+	return len(params) - 1
 }
 
 func methodParameters(parameters []domain.Parameter) string {
