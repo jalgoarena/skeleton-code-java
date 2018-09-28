@@ -1,9 +1,10 @@
 package main
 
 import (
+	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/jalgoarena/skeleton-code-java/app"
-	"os"
+	"net/http"
 )
 
 func SetupRouter() *gin.Engine {
@@ -17,28 +18,20 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func main() {
-	SetupProblemsHost()
-	router := SetupRouter()
+var (
+	problemsUrl string
+	port        string
+)
 
-	const defaultPort = "8081"
-	port := os.Getenv("PORT")
-
-	if len(port) == 0 {
-		port = defaultPort
-	}
-
-	router.Run(":" + port)
+func init() {
+	flag.StringVar(&problemsUrl, "problems-url", "http://localhost:8080", "Problems store url")
+	flag.StringVar(&port, "port", "8081", "Port to listen on")
+	flag.Parse()
 }
 
-func SetupProblemsHost() {
-	const defaultProblemsHost = "http://localhost:8080"
-
-	problemsHost := os.Getenv("PROBLEMS_HOST")
-
-	if len(problemsHost) == 0 {
-		problemsHost = defaultProblemsHost
-	}
-
-	app.SetProblemsHost(problemsHost)
+func main() {
+	app.SetProblemsHost(problemsUrl)
+	app.SetHttpClient(&http.Client{})
+	router := SetupRouter()
+	router.Run(":" + port)
 }
