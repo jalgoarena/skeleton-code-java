@@ -1,28 +1,44 @@
 language: go
-sudo: false
+sudo: required
+services:
+  - docker
+
 matrix:
   include:
-  # "1.x" always refers to the latest Go version, inc. the patch release.
-  # e.g. "1.x" is 1.11 until 1.11.1 is available.
   - go: 1.x
     env: LATEST=true
-  - go: 1.7.x
-  - go: 1.8.x
-  - go: 1.9.x
-  - go: 1.10.x
-  - go: 1.11.x
-  - go: tip
-  allow_failures:
-  - go: tip
 
 before_install:
-  # gox simplifies building for multiple architectures
   - go get github.com/mitchellh/gox
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - dep ensure
+
+install:
+  - # skip
 
 script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic
+  - diff -u <(echo -n) <(gofmt -d .)
+  - dep ensure
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - if [ "${LATEST}" = "true" ]; then gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_1.0.0_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  - provider: releases
+    api_key:
+      secure: wLN41U3uZ3BJ+6bx3xk0p9JyQk0usQqw0ts2uUNsRLn1RWbtJTE4CM48X2EWQ6J66MkD14JEr7XEBxKZ98q+FnyKMfcHdZCJcOvmDHsmCteMn4vFLSSmMONVQuuwKQapevBUB3xHL/euoHPWKin2nZ61Le+DscpjzZ+LasP7vBn1C5poR3Tsbj+yezM/qS5M7+qR/a4qR0KOzkqqO8lunn/FMy2YmRVk7I8JimkWjTrJkBD3MVUUKtuujB/SZzZ276lIcrBod83QqiLXg4rZE4rWGYhX6UFB3eHocvTNKpaVqbsK+rhI3gt1kS0oHfPA8A7dV3QbIq+dB/+XuTQsEjF0on68SrNc7j7a6+KRPB2soeGDnyz0GNg6eu55FShcelDAcXbAO5La19jsibCyO6jBiPJjArEXpBn+AL1xjLtTdHy24lshxrFfuKvEU+vt4zPL6/+bL7hQxKLbGmV+Unc6a4sPEaex1C+ubPE6FVtQnuvMxM1xc1kAr+p1ECYXmzb+tzQDjdIytALxoTG5S8aXYnb8V248MXmTmQWCY45mFx/efFAYenN2gFAxqPXa46MwcKZaA3sQ8BECYdAG4aZKzb5ezVDSSJGw/bfJrgzjg7kij2GDYswV8PthiZ1UF1wfZFkdsQMiCXwY1+ubPE19v7YBsD1dm3Fz57QwBAE=
+    skip_cleanup: true
+    file_glob: true
+    file:
+      - bin/*
+    on:
+      repo: jalgoarena/skeleton-code-java
+      tags: true
+      condition: $LATEST = true
+  - provider: script
+    script: bash docker_push
+    on:
+      repo: jalgoarena/skeleton-code-java
+      tags: true
