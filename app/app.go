@@ -42,6 +42,20 @@ func SetHttpClient(httpClient HttpClient) {
 	client = httpClient
 }
 
+func HealthCheck(c *gin.Context) {
+	_, err := client.Get(fmt.Sprintf("%s/health", problemsHost))
+
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"status": "fail",
+			"reason": fmt.Sprintf("problems service unavailable: %s", problemsHost),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "lang": "java"})
+}
+
 // curl -i http://localhost:8080/api/v1/code/java/fib
 func GetSkeletonCode(c *gin.Context) {
 	problemId := c.Param("problemId")
