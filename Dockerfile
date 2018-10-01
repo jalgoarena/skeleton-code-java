@@ -12,11 +12,11 @@ RUN dep ensure
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags="-w -s" -o /app/main .
 
-FROM scratch
+FROM alpine
 
 COPY --from=builder /app/main /app/main
 
-EXPOSE 8080
+EXPOSE 8081
 ENV PROBLEMS_URL "http://localhost:8080"
 
 ENTRYPOINT /app/main -problems-url $PROBLEMS_URL

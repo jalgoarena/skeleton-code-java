@@ -30,6 +30,7 @@ public class Solution {
 )
 
 func SetProblemsHost(host string) {
+	fmt.Printf("Using problems host: %s\n", host)
 	problemsHost = host
 }
 
