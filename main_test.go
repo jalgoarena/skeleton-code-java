@@ -10,13 +10,13 @@ import (
 	"testing"
 )
 
-type MockHttpClient struct {
-	problemJson string
+type MockHTTPClient struct {
+	problemJSON string
 }
 
-func (m *MockHttpClient) Get(url string) (*http.Response, error) {
+func (m *MockHTTPClient) Get(url string) (*http.Response, error) {
 	response := &http.Response{
-		Body:       ioutil.NopCloser(bytes.NewBuffer([]byte(m.problemJson))),
+		Body:       ioutil.NopCloser(bytes.NewBuffer([]byte(m.problemJSON))),
 		StatusCode: http.StatusOK,
 	}
 
@@ -39,10 +39,10 @@ public class Solution {
 }`
 	)
 
-	httpClient := &MockHttpClient{problemJson: problemsJson}
-	api.SetupProblems(problemsUrl, httpClient)
+	httpClient := &MockHTTPClient{problemJSON: problemsJSON}
+	api.SetupProblems(problemsURL, httpClient)
 
-	router := SetupRouter()
+	router := setupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/fib", nil)
@@ -69,10 +69,10 @@ public class Solution {
 }`
 	)
 
-	httpClient := &MockHttpClient{problemJson: problemsJson}
-	api.SetupProblems(problemsUrl, httpClient)
+	httpClient := &MockHTTPClient{problemJSON: problemsJSON}
+	api.SetupProblems(problemsURL, httpClient)
 
-	router := SetupRouter()
+	router := setupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/2-sum", nil)
@@ -100,10 +100,10 @@ public class Solution {
 }`
 	)
 
-	httpClient := &MockHttpClient{problemJson: problemsJson}
-	api.SetupProblems(problemsUrl, httpClient)
+	httpClient := &MockHTTPClient{problemJSON: problemsJSON}
+	api.SetupProblems(problemsURL, httpClient)
 
-	router := SetupRouter()
+	router := setupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/word-ladder", nil)
@@ -130,10 +130,10 @@ public class Solution {
 }`
 	)
 
-	httpClient := &MockHttpClient{problemJson: problemsJson}
-	api.SetupProblems(problemsUrl, httpClient)
+	httpClient := &MockHTTPClient{problemJSON: problemsJSON}
+	api.SetupProblems(problemsURL, httpClient)
 
-	router := SetupRouter()
+	router := setupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/code/java/insert-range", nil)
@@ -143,7 +143,7 @@ public class Solution {
 	assert.Equal(t, javaSourceCode, w.Body.String())
 }
 
-const problemsJson = `[{
+const problemsJSON = `[{
   "id": "fib",
   "func": {
     "name": "fib",

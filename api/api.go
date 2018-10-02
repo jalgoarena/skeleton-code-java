@@ -66,8 +66,8 @@ func downloadProblems() {
 	log.Printf("[INFO] problems loaded, count = %d", len(problems))
 }
 
-func loadProblems(problemsJson io.Reader) error {
-	jsonParser := json.NewDecoder(problemsJson)
+func loadProblems(problemsJSON io.Reader) error {
+	jsonParser := json.NewDecoder(problemsJSON)
 
 	if err := jsonParser.Decode(&problems); err != nil {
 		return err

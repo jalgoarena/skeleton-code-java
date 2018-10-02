@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func SetupRouter() *gin.Engine {
+func setupRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("health", api.HealthCheck)
@@ -21,12 +21,12 @@ func SetupRouter() *gin.Engine {
 }
 
 var (
-	problemsUrl string
+	problemsURL string
 	port        string
 )
 
 func init() {
-	flag.StringVar(&problemsUrl, "problems-url", "http://localhost:8080", "Problems store url")
+	flag.StringVar(&problemsURL, "problems-url", "http://localhost:8080", "Problems store url")
 	flag.StringVar(&port, "port", "8081", "Port to listen on")
 	flag.Parse()
 
@@ -34,7 +34,7 @@ func init() {
 }
 
 func main() {
-	api.SetupProblems(problemsUrl, &http.Client{})
-	router := SetupRouter()
+	api.SetupProblems(problemsURL, &http.Client{})
+	router := setupRouter()
 	router.Run(":" + port)
 }
