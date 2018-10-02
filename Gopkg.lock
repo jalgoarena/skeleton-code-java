@@ -26,6 +26,12 @@
   version = "v1.2.0"
 
 [[projects]]
+  name = "github.com/jalgoarena/problems-store"
+  packages = ["domain"]
+  revision = "f117c8524f4edde7766d2025087e9bfb9f67c48b"
+  version = "v1.0.4"
+
+[[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
   revision = "1624edc4454b8682399def8740d46db5e4362ba4"
@@ -88,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a26fe2ec5dcade0cfe44a2d19f5fae623b70367afcd1b74495d611eefd82a98d"
+  inputs-digest = "0e68a5f2267db585cd3c1410c95dc955bcabfa34adcc1b45e55b67159a8a88ca"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -107,7 +107,7 @@ func GetSkeletonCode(c *gin.Context) {
 		return problem.Id == problemId
 	})
 
-	sourceCode, err := buildSourceCode(&problem)
+	sourceCode, err := buildSourceCode(problem)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Cannot process template %s: %v", problemId, err)
 	}

@@ -143,6 +143,23 @@ public class Solution {
 	assert.Equal(t, javaSourceCode, w.Body.String())
 }
 
+func BenchmarkGetSkeletonCodeForFib(b *testing.B) {
+	httpClient := &MockHTTPClient{problemJSON: problemsJSON}
+	api.SetupProblems(problemsURL, httpClient)
+
+	testRouter := setupRouter()
+
+	for i := 0; i < b.N; i++ {
+		resp := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/api/v1/code/java/fib", nil)
+		testRouter.ServeHTTP(resp, req)
+
+		if resp.Code != 200 {
+			b.Errorf("GET /api/v1/code/java/fib failed with response code: %d", resp.Code)
+		}
+	}
+}
+
 const problemsJSON = `[{
   "id": "fib",
   "func": {
