@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/jalgoarena/skeleton-code-java/app"
+	"log"
 	"net/http"
 )
 
@@ -28,6 +29,8 @@ func init() {
 	flag.StringVar(&problemsUrl, "problems-url", "http://localhost:8080", "Problems store url")
 	flag.StringVar(&port, "port", "8081", "Port to listen on")
 	flag.Parse()
+
+	log.SetFlags(log.LstdFlags)
 }
 
 func main() {

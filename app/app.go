@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 	"text/template"
+	"time"
 )
 
 var (
@@ -47,7 +48,9 @@ func downloadProblems() {
 	resp, err := client.Get(problemsUrl)
 
 	if err != nil {
-		log.Printf("[ERROR] could not download problems: %v\n", err)
+		log.Printf("[ERROR] could not download problems: %v", err)
+		log.Printf("[INFO] Retry problems download in 10 seconds...")
+		time.AfterFunc(10*time.Second, downloadProblems)
 		return
 	}
 
@@ -56,6 +59,8 @@ func downloadProblems() {
 
 	if err != nil {
 		log.Printf("[ERROR] could not read problems: %v\n", err)
+		log.Printf("[INFO] Retry problems download in 10 seconds...")
+		time.AfterFunc(10*time.Second, downloadProblems)
 		return
 	}
 
