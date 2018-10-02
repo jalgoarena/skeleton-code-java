@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jalgoarena/problems-store/app"
 	"github.com/jalgoarena/problems-store/domain"
 	"io"
 	"log"
@@ -30,7 +29,7 @@ public class Solution {
 }`
 	problemsHost string
 	client       HttpClient
-	problems     []domain.Problem
+	problems     domain.Problems
 )
 
 func SetupProblems(host string, httpClient HttpClient) {
@@ -104,7 +103,7 @@ func GetSkeletonCode(c *gin.Context) {
 		return
 	}
 
-	problem := app.First(problems, func(problem domain.Problem) bool {
+	problem := problems.First(func(problem domain.Problem) bool {
 		return problem.Id == problemId
 	})
 
