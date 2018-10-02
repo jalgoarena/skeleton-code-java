@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"github.com/jalgoarena/skeleton-code-java/app"
+	"github.com/jalgoarena/skeleton-code-java/api"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -40,7 +40,7 @@ public class Solution {
 	)
 
 	httpClient := &MockHttpClient{problemJson: problemsJson}
-	app.SetupProblems(problemsUrl, httpClient)
+	api.SetupProblems(problemsUrl, httpClient)
 
 	router := SetupRouter()
 
@@ -70,7 +70,7 @@ public class Solution {
 	)
 
 	httpClient := &MockHttpClient{problemJson: problemsJson}
-	app.SetupProblems(problemsUrl, httpClient)
+	api.SetupProblems(problemsUrl, httpClient)
 
 	router := SetupRouter()
 
@@ -101,7 +101,7 @@ public class Solution {
 	)
 
 	httpClient := &MockHttpClient{problemJson: problemsJson}
-	app.SetupProblems(problemsUrl, httpClient)
+	api.SetupProblems(problemsUrl, httpClient)
 
 	router := SetupRouter()
 
@@ -131,7 +131,7 @@ public class Solution {
 	)
 
 	httpClient := &MockHttpClient{problemJson: problemsJson}
-	app.SetupProblems(problemsUrl, httpClient)
+	api.SetupProblems(problemsUrl, httpClient)
 
 	router := SetupRouter()
 

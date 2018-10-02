@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/gin-gonic/gin"
-	"github.com/jalgoarena/skeleton-code-java/app"
+	"github.com/jalgoarena/skeleton-code-java/api"
 	"log"
 	"net/http"
 )
@@ -11,10 +11,10 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
-	router.GET("health", app.HealthCheck)
+	router.GET("health", api.HealthCheck)
 	v1 := router.Group("api/v1")
 	{
-		v1.GET("/code/java/:problemId", app.GetSkeletonCode)
+		v1.GET("/code/java/:problemId", api.GetSkeletonCode)
 	}
 
 	return router
@@ -34,7 +34,7 @@ func init() {
 }
 
 func main() {
-	app.SetupProblems(problemsUrl, &http.Client{})
+	api.SetupProblems(problemsUrl, &http.Client{})
 	router := SetupRouter()
 	router.Run(":" + port)
 }
