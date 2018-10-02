@@ -31,8 +31,7 @@ func init() {
 }
 
 func main() {
-	app.SetProblemsHost(problemsUrl)
-	app.SetHttpClient(&http.Client{})
+	app.SetupProblems(problemsUrl, &http.Client{})
 	router := SetupRouter()
 	router.Run(":" + port)
 }

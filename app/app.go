@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jalgoarena/problems-store/app"
 	"github.com/jalgoarena/problems-store/domain"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"strings"
 	"text/template"
@@ -27,19 +29,51 @@ public class Solution {
 }`
 	problemsHost string
 	client       HttpClient
+	problems     []domain.Problem
 )
 
-func SetProblemsHost(host string) {
-	fmt.Printf("Using problems host: %s\n", host)
+func SetupProblems(host string, httpClient HttpClient) {
+	log.Printf("[INFO] Using problems host: %s\n", host)
+
+	client = httpClient
 	problemsHost = host
+
+	downloadProblems()
+}
+
+func downloadProblems() {
+	problemsUrl := fmt.Sprintf("%s/api/v1/problems", problemsHost)
+
+	resp, err := client.Get(problemsUrl)
+
+	if err != nil {
+		log.Printf("[ERROR] could not download problems: %v\n", err)
+		return
+	}
+
+	defer resp.Body.Close()
+	err = loadProblems(resp.Body)
+
+	if err != nil {
+		log.Printf("[ERROR] could not read problems: %v\n", err)
+		return
+	}
+
+	log.Printf("[INFO] problems loaded, count = %d", len(problems))
+}
+
+func loadProblems(problemsJson io.Reader) error {
+	jsonParser := json.NewDecoder(problemsJson)
+
+	if err := jsonParser.Decode(&problems); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type HttpClient interface {
 	Get(string) (*http.Response, error)
-}
-
-func SetHttpClient(httpClient HttpClient) {
-	client = httpClient
 }
 
 func HealthCheck(c *gin.Context) {
@@ -59,30 +93,17 @@ func HealthCheck(c *gin.Context) {
 // curl -i http://localhost:8080/api/v1/code/java/fib
 func GetSkeletonCode(c *gin.Context) {
 	problemId := c.Param("problemId")
-	problemUrl := fmt.Sprintf("%s/api/v1/problems/%s", problemsHost, problemId)
 
-	resp, err := client.Get(problemUrl)
-
-	if err != nil {
-		c.String(http.StatusInternalServerError, "[err] %s: %v", c.Request.RequestURI, err)
-		return
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		c.String(resp.StatusCode, "[err] %s: %v", problemUrl, string(body))
+	if len(problems) == 0 {
+		c.String(http.StatusInternalServerError, "[err] %s: problems could not be downloaded", c.Request.RequestURI)
 		return
 	}
 
-	problem, err := loadProblem(body)
+	problem := app.First(problems, func(problem domain.Problem) bool {
+		return problem.Id == problemId
+	})
 
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Cannot parse problem %s: %v", problemId, err)
-		return
-	}
-
-	sourceCode, err := buildSourceCode(problem)
+	sourceCode, err := buildSourceCode(&problem)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Cannot process template %s: %v", problemId, err)
 	}
@@ -174,14 +195,4 @@ func withGeneric(baseType string, generic string) string {
 	}
 
 	return fmt.Sprintf("%s<%s>", baseType, generic)
-}
-
-func loadProblem(problemsJson []byte) (*domain.Problem, error) {
-	var problem domain.Problem
-
-	if err := json.Unmarshal(problemsJson, &problem); err != nil {
-		return nil, err
-	}
-
-	return &problem, nil
 }

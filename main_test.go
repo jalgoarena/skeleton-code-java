@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
@@ -24,14 +23,127 @@ func (m *MockHttpClient) Get(url string) (*http.Response, error) {
 	return response, nil
 }
 
-func TestMain(m *testing.M) {
-	app.SetProblemsHost(problemsUrl)
-	os.Exit(m.Run())
-}
-
 func TestGetSkeletonCodeForFib(t *testing.T) {
 	var (
-		problemJson = `{
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param n id of fibonacci term to be returned
+     * @return N'th term of Fibonacci sequence
+     */
+    public long fib(int n) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemsJson}
+	app.SetupProblems(problemsUrl, httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/fib", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeForTwoSum(t *testing.T) {
+	var (
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param numbers An array of Integer
+     * @param target target = numbers[index1] + numbers[index2]
+     * @return Indices of the two numbers
+     */
+    public int[] twoSum(int[] numbers, int target) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemsJson}
+	app.SetupProblems(problemsUrl, httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/2-sum", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeForWordLadder(t *testing.T) {
+	var (
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param begin the begin word
+     * @param end the end word
+     * @param dict the dictionary
+     * @return The shortest length
+     */
+    public int ladderLength(String begin, String end, HashSet<String> dict) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemsJson}
+	app.SetupProblems(problemsUrl, httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/word-ladder", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+func TestGetSkeletonCodeForInsertRange(t *testing.T) {
+	var (
+		javaSourceCode = `import java.util.*;
+import com.jalgoarena.type.*;
+
+public class Solution {
+    /**
+     * @param intervalsList sorted, non-overlapping list of Intervals
+     * @param insert interval to insert
+     * @return Array with inserted ranges
+     */
+    public ArrayList<Interval> insertRange(ArrayList<Interval> intervalsList, Interval insert) {
+        // Write your code here
+    }
+}`
+	)
+
+	httpClient := &MockHttpClient{problemJson: problemsJson}
+	app.SetupProblems(problemsUrl, httpClient)
+
+	router := SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/code/java/insert-range", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, javaSourceCode, w.Body.String())
+}
+
+const problemsJson = `[{
   "id": "fib",
   "func": {
     "name": "fib",
@@ -49,37 +161,7 @@ func TestGetSkeletonCodeForFib(t *testing.T) {
       }
     ]
   }
-}`
-		javaSourceCode = `import java.util.*;
-import com.jalgoarena.type.*;
-
-public class Solution {
-    /**
-     * @param n id of fibonacci term to be returned
-     * @return N'th term of Fibonacci sequence
-     */
-    public long fib(int n) {
-        // Write your code here
-    }
-}`
-	)
-
-	httpClient := &MockHttpClient{problemJson: problemJson}
-	app.SetHttpClient(httpClient)
-
-	router := SetupRouter()
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1/code/java/fib", nil)
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, javaSourceCode, w.Body.String())
-}
-
-func TestGetSkeletonCodeForTwoSum(t *testing.T) {
-	var (
-		problemJson = `{
+}, {
   "id": "2-sum",
   "func": {
     "name": "twoSum",
@@ -103,38 +185,7 @@ func TestGetSkeletonCodeForTwoSum(t *testing.T) {
       }
     ]
   }
-}`
-		javaSourceCode = `import java.util.*;
-import com.jalgoarena.type.*;
-
-public class Solution {
-    /**
-     * @param numbers An array of Integer
-     * @param target target = numbers[index1] + numbers[index2]
-     * @return Indices of the two numbers
-     */
-    public int[] twoSum(int[] numbers, int target) {
-        // Write your code here
-    }
-}`
-	)
-
-	httpClient := &MockHttpClient{problemJson: problemJson}
-	app.SetHttpClient(httpClient)
-
-	router := SetupRouter()
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1/code/java/2-sum", nil)
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, javaSourceCode, w.Body.String())
-}
-
-func TestGetSkeletonCodeForWordLadder(t *testing.T) {
-	var (
-		problemJson = `{
+}, {
   "id": "word-ladder",
   "func": {
     "name": "ladderLength",
@@ -164,39 +215,7 @@ func TestGetSkeletonCodeForWordLadder(t *testing.T) {
       }
     ]
   }
-}`
-		javaSourceCode = `import java.util.*;
-import com.jalgoarena.type.*;
-
-public class Solution {
-    /**
-     * @param begin the begin word
-     * @param end the end word
-     * @param dict the dictionary
-     * @return The shortest length
-     */
-    public int ladderLength(String begin, String end, HashSet<String> dict) {
-        // Write your code here
-    }
-}`
-	)
-
-	httpClient := &MockHttpClient{problemJson: problemJson}
-	app.SetHttpClient(httpClient)
-
-	router := SetupRouter()
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1/code/java/word-ladder", nil)
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, javaSourceCode, w.Body.String())
-}
-
-func TestGetSkeletonCodeForInsertRange(t *testing.T) {
-	var (
-		problemJson = `{
+}, {
   "id": "insert-range",
   "func": {
     "name": "insertRange",
@@ -220,31 +239,4 @@ func TestGetSkeletonCodeForInsertRange(t *testing.T) {
       }
     ]
   }
-}`
-		javaSourceCode = `import java.util.*;
-import com.jalgoarena.type.*;
-
-public class Solution {
-    /**
-     * @param intervalsList sorted, non-overlapping list of Intervals
-     * @param insert interval to insert
-     * @return Array with inserted ranges
-     */
-    public ArrayList<Interval> insertRange(ArrayList<Interval> intervalsList, Interval insert) {
-        // Write your code here
-    }
-}`
-	)
-
-	httpClient := &MockHttpClient{problemJson: problemJson}
-	app.SetHttpClient(httpClient)
-
-	router := SetupRouter()
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1/code/java/insert-range", nil)
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, javaSourceCode, w.Body.String())
-}
+}]`
